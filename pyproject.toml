@@ -17,6 +17,7 @@ xgboost = "^1.7.5"
 hyperopt = "^0.2.7"
 pyarrow = "^11.0.0"
 fastparquet = "^2023.2.0"
+dvc-azure = "^2.21.1"
 
 
 [build-system]

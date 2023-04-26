@@ -1,4 +1,4 @@
 [core]
     remote = remote-storage
 ['remote "remote-storage"']
-    url = s3://bucket_name/folder/
+    url = azure://taxi-duration-dataset/
