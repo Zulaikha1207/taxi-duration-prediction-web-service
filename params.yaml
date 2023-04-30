@@ -1,9 +1,10 @@
-data:
-  path_data: 'data/green_tripdata_2022-01.parquet'
+load_data:
+  path_data: data/green_tripdata_2022-01.parquet
 
-data_preprocessing:
-  drop_percent: 0.15
-  preprocessed_csv: data/preprocessed_df.csv
+preprocess:
+  min_duration: 1
+  max_duration: 60
+  preprocessed_data: data/taxi_data_preprocessed.parquet
 
 train:
   target_column: RainTomorrow

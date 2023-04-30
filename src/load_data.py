@@ -10,7 +10,7 @@ def load_data(config_path: Text) -> None:
         config = yaml.safe_load(config_file)
     
     print('Loading data..')
-    dataset = pd.read_parquet(config['data']['path_data'])
+    dataset = pd.read_parquet(config['load_data']['path_data'])
     print(dataset.head())
     print('Data load complete!')
 
