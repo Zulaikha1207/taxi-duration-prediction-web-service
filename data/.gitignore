@@ -4,3 +4,4 @@
 /green_tripdata_2022-01.parquet
 /green_tripdata_2022-02.parquet
 /green_tripdata_2022-03.parquet
+/taxi_data_preprocessed.parquet
