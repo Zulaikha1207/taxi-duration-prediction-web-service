@@ -7,7 +7,7 @@ preprocess:
   preprocessed_data: data/taxi_data_preprocessed.parquet
 
 train:
-  target_column: RainTomorrow
+  target_column: duration
   test_size: 0.3
   random_state: 42
   train_pipe_path: reports/train_pipe.joblib
