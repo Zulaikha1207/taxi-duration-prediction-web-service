@@ -1,0 +1,43 @@
+stages:
+  data_load:
+    cmd: python src/load_data.py --config=params.yaml
+    deps:
+    - data/green_tripdata_2022-01.parquet
+    - src/load_data.py
+    params:
+    - load_data
+
+  preprocess:
+    cmd: python src/preprocess.py --config=params.yaml
+    deps:
+    - data/green_tripdata_2022-01.parquet
+    - src/preprocess.py
+    params:
+    - load_data
+    - preprocess
+    outs:
+    - data/taxi_data_preprocessed.parquet
+
+  train:
+    cmd: python src/train.py --config=params.yaml
+    deps:
+    - data/taxi_data_preprocessed.parquet
+    - src/train.py 
+    params:
+    - train
+    - model
+    outs:
+    - reports/best_estimator.bin
+    - reports/RMSE_comparision.png
+
+  evaluate:
+    cmd: python src/evaluate.py --config=params.yaml
+    deps:
+    - data/green_tripdata_2022-02.parquet
+    - src/evaluate.py
+    - reports/best_estimator.bin
+    params:
+    - evaluate
+    - model
+    outs:
+    - reports/metrics_file.json
