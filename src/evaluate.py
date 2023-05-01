@@ -5,6 +5,8 @@ import yaml
 from typing import Text
 import math
 import pickle
+import json
+
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.linear_model import LinearRegression
 from sklearn.linear_model import Lasso
@@ -39,8 +41,19 @@ def evaluate(config_path: Text) -> None:
     
     y_pred = model.predict(X_eval)
     rmse = mean_squared_error(y_eval, y_pred, squared=False)
-
     print(f'RMSE score on validation set: {rmse}')
+
+    # save rmse metrics file
+    print('Save metrics')
+    json.dump(
+        obj={'rmse':rmse},
+        fp=open(config['evaluate']['metrics_file_path'], 'w')
+    )
+
+    print('F1 metrics file saved to: ', config['evaluate']['metrics_file_path'])
+
+
+    
 
 #to run from CLI use a constructer that allows to parse config file as an argument to the data_load function
 if __name__ == '__main__':

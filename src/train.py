@@ -5,11 +5,14 @@ import yaml
 from typing import Text
 import math
 import pickle
+import matplotlib.pyplot as plt
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.linear_model import LinearRegression
 from sklearn.linear_model import Lasso
 from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_squared_error
+from sklearn.model_selection import cross_val_score
+
 
 import sys
 sys.path.insert(0, './src/train')
@@ -36,24 +39,51 @@ def train_model(config_path: Text) -> None:
     y_train = df[config['train']['target_column']].values
 
     print('Get estimator name')
-    estimator_name = config['model']['estimator_name']
-    
-    print('Fitting model..')
-    model = training(input_features=X_train,
-                 target=y_train,
-                 estimator_name=estimator_name,
-                 param_grid= config['model']['estimators'][estimator_name]['param_grid'],
-                 cv=config['model']['cv'])
-    
-    print(f'Best RMSE score: {model.best_score_}')
-    
-    print('Saving model..')
 
-    with open('reports/xgboost.bin', 'wb') as f_out:
-        pickle.dump((dv, model), f_out)
-    #model_path= config["model"]["model_path"]
-    #joblib.dump(model, model_path)
+    # Get estimator names
+    estimator_name = config['model']['estimators'].keys()
+    
+    rmse_scores = {}
+    best_estimator_name = None
+    best_rmse_score = float('inf')
+    best_estimator = None
 
+    for estimator_names in estimator_name:
+        print(f'Fitting {estimator_names} model..')
+        estimator = training(input_features=X_train,
+                            target=y_train,
+                            estimator_name=estimator_names,
+                            param_grid=config['model']['estimators'][estimator_names]['param_grid'],
+                            cv=config['model']['cv'])
+        # Calculate cross-validation RMSE scores
+        cv_scores = np.sqrt(-cross_val_score(estimator.best_estimator_, X_train, y_train, 
+                                            scoring='neg_mean_squared_error', cv=config['model']['cv']))
+        rmse_scores[estimator_names] = cv_scores
+    
+    # Update best RMSE score and estimator name
+    if np.mean(cv_scores) < best_rmse_score:
+        best_rmse_score = np.mean(cv_scores)
+        best_estimator_name = estimator_names
+        best_estimator = estimator.best_estimator_
+
+    print(f'Best RMSE score: {best_rmse_score} for estimator {best_estimator_name}')
+
+    print("Plotting RMSE scores for each estimator..")
+    # Plot RMSE scores
+    fig, ax = plt.subplots()
+    for estimator_names in estimator_name:
+        ax.plot(rmse_scores[estimator_names], label=estimator_names)
+
+    ax.set(title='RMSE score comparison for different estimators',
+        xlabel='Number of cross-validation folds',
+        ylabel='RMSE score')
+    ax.legend()
+    plt.savefig(config['model']['rmse_comparison_plot'])
+
+    # Save best estimator
+    print('Saving best model..')
+    with open(config['model']['model_path'], 'wb') as f_out:
+        pickle.dump((dv, best_estimator), f_out)
 
 #to run from CLI use a constructer that allows to parse config file as an argument to the data_load function
 if __name__ == '__main__':
