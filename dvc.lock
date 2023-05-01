@@ -1,0 +1,137 @@
+schema: '2.0'
+stages:
+  data_load:
+    cmd: python src/load_data.py --config=params.yaml
+    deps:
+    - path: data/green_tripdata_2022-01.parquet
+      md5: 05979422aac045f751da594792411e22
+      size: 1254291
+    - path: src/load_data.py
+      md5: 7bf3df73d71f80aad9a6e53bf66b9102
+      size: 709
+    params:
+      params.yaml:
+        load_data:
+          path_data: data/green_tripdata_2022-01.parquet
+  preprocess:
+    cmd: python src/preprocess.py --config=params.yaml
+    deps:
+    - path: data/green_tripdata_2022-01.parquet
+      md5: 05979422aac045f751da594792411e22
+      size: 1254291
+    - path: src/preprocess.py
+      md5: 33b33657a4eecb26ba5af7acb6e786c1
+      size: 1408
+    params:
+      params.yaml:
+        load_data:
+          path_data: data/green_tripdata_2022-01.parquet
+        preprocess:
+          min_duration: 1
+          max_duration: 60
+          preprocessed_data: data/taxi_data_preprocessed.parquet
+    outs:
+    - path: data/taxi_data_preprocessed.parquet
+      md5: e8ea0b1a9fd16f93d5fbf6b54bd49ae2
+      size: 2043959
+  train:
+    cmd: python src/train.py --config=params.yaml
+    deps:
+    - path: data/taxi_data_preprocessed.parquet
+      md5: e8ea0b1a9fd16f93d5fbf6b54bd49ae2
+      size: 2043959
+    - path: src/train.py
+      md5: d671c7f03bb9362135968a9523d27324
+      size: 3556
+    params:
+      params.yaml:
+        model:
+          cv: 7
+          estimator_name: xgb
+          estimators:
+            linreg:
+              param_grid:
+                fit_intercept:
+                - false
+            lassoreg:
+              param_grid:
+                alpha:
+                - 0.1
+                random_state:
+                - 42
+            xgb:
+              param_grid:
+                learning_rate:
+                - 0.28
+                max_depth:
+                - 41
+                min_child_weight:
+                - 2.44
+                reg_alpha:
+                - 0.19
+                reg_lambda:
+                - 0.02
+                random_state:
+                - 42
+          model_path: reports/best_estimator.bin
+          rmse_comparison_plot: reports/RMSE_comparision.png
+        train:
+          target_column: duration
+    outs:
+    - path: reports/RMSE_comparision.png
+      md5: 5ef573d47f48336e1d054e26b2b3a338
+      size: 38847
+    - path: reports/best_estimator.bin
+      md5: c4dd5c6420ad32d0d3d9de31b4a4f14c
+      size: 5874295
+  evaluate:
+    cmd: python src/evaluate.py --config=params.yaml
+    deps:
+    - path: data/green_tripdata_2022-02.parquet
+      md5: b2f1c0f9ce3d4ae1e2ea74501a48b9d2
+      size: 1428262
+    - path: reports/best_estimator.bin
+      md5: c4dd5c6420ad32d0d3d9de31b4a4f14c
+      size: 5874295
+    - path: src/evaluate.py
+      md5: 1a0b5ac06e7ecac5391126566bdc17f1
+      size: 2140
+    params:
+      params.yaml:
+        evaluate:
+          path_data: data/green_tripdata_2022-02.parquet
+          metrics_file_path: reports/metrics_file.json
+        model:
+          cv: 7
+          estimator_name: xgb
+          estimators:
+            linreg:
+              param_grid:
+                fit_intercept:
+                - false
+            lassoreg:
+              param_grid:
+                alpha:
+                - 0.1
+                random_state:
+                - 42
+            xgb:
+              param_grid:
+                learning_rate:
+                - 0.28
+                max_depth:
+                - 41
+                min_child_weight:
+                - 2.44
+                reg_alpha:
+                - 0.19
+                reg_lambda:
+                - 0.02
+                random_state:
+                - 42
+          model_path: reports/best_estimator.bin
+          rmse_comparison_plot: reports/RMSE_comparision.png
+    outs:
+    - path: reports/metrics_file.json
+      md5: 9ef0169876ca0e2a1099b15b53aec218
+      size: 26
