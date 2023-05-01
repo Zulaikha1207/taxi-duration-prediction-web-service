@@ -28,8 +28,10 @@ model:
         reg_alpha: [0.19]
         reg_lambda: [0.02]
         random_state: [42]
+  model_path: reports/xgboost.bin
 
 evaluate:
+  path_data: data/green_tripdata_2022-02.parquet
   metrics_file_path: reports/metrics_file.json
   roc_plots_path: reports/roc.png
   precision_recall_plot_path: reports/precision_recall_curve.png

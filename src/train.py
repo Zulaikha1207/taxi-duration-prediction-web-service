@@ -4,6 +4,7 @@ import pandas as pd
 import yaml
 from typing import Text
 import math
+import pickle
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.linear_model import LinearRegression
 from sklearn.linear_model import Lasso
@@ -47,6 +48,9 @@ def train_model(config_path: Text) -> None:
     print(f'Best RMSE score: {model.best_score_}')
     
     print('Saving model..')
+
+    with open('reports/xgboost.bin', 'wb') as f_out:
+        pickle.dump((dv, model), f_out)
     #model_path= config["model"]["model_path"]
     #joblib.dump(model, model_path)
 
