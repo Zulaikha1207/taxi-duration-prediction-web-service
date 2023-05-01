@@ -39,7 +39,11 @@ python src/load_data.py --config=params.yaml
 dvc repro
 ```
 
-- Push all data, metrics to the cloud: On running the above command, each stage generates metadata, plots, metrics, etc, which are tracked by DVC. These metadata files are pushed to the Azure cloud using the following command: 
+- Push all data, metrics to the cloud: On running the above command, each stage generates metadata, plots, metrics, etc, which are tracked by DVC. Here's a plot that compares the performance of the three regressors used, i.e., linear regression, lasso regression and XGBoost regreesor:
+
+![rmse compare](RMSE_comparision.png)
+
+These metadata files are pushed to the Azure cloud using the following command: 
 
 ```python
 dvc push
