@@ -8,15 +8,26 @@ preprocess:
 
 train:
   target_column: duration
-  test_size: 0.3
-  random_state: 42
-  train_pipe_path: reports/train_pipe.joblib
 
-model: 
-  criterion: gini
-  max_depth: 12
-  max_features: auto
-  n_estimators: 5
+model:
+  cv: 5
+  estimator_name: xgb
+  estimators:
+    linreg:
+      param_grid:
+        random_state: [42]
+    lassoreg:
+      param_grid:
+        alpha: [0.1]
+        random_state: [42]
+    xgb:
+      param_grid:
+        learning_rate: [0.28]
+        max_depth: [41]
+        min_child_weight: [2.44]
+        reg_alpha: [0.19]
+        reg_lambda: [0.02]
+        random_state: [42]
 
 evaluate:
   metrics_file_path: reports/metrics_file.json
